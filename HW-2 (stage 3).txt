@@ -1,0 +1,68 @@
+import copy
+
+n = int(input())
+
+fw_array = [[0 for j in range(n)] for i in range(n)]
+
+'''
+5
+0 4 2 5 *
+* 0 1 * 4
+1 3 0 1 2
+-2 * * 0 2
+* -3 3 1 0
+'''
+
+def path(source, destination, arr):
+    path = []
+    path.append(source)
+    arr_cp = copy.deepcopy(arr)
+    is_visited = [False] * len(arr)
+    is_visited[0] = True
+    for i in range(len(arr)):
+        arr_cp[i][i] = 999
+    if source == destination:
+        path.append(destination)
+        return path
+    
+    else:
+        while path[-1] != destination:
+            row = arr_cp[path[-1]-1]
+            
+            minIndex = row.index(min(row))
+            
+            if is_visited[minIndex]:
+                row[minIndex] = 999
+                minIndex = row.index(min(row))
+            
+            if arr_cp[minIndex][destination-1] == row[destination-1]:
+                row[minIndex] = 999
+                minIndex = row.index(min(row))
+            if arr_cp[minIndex][destination-1] == float('inf'):
+                row[minIndex] = 999
+                minIndex = row.index(min(row))
+            path.append(minIndex+1)
+        return path
+
+
+for i in range(n):
+    value = input().split()
+    for j in range(n):
+        if value[j] == '*':
+            fw_array[i][j] = float('inf')
+        else:
+            fw_array[i][j] = int(value[j])
+            
+fw_array_cp = copy.deepcopy(fw_array)
+
+
+for k in range(n):
+    for i in range(n):
+        for j in range(n):
+            fw_array[i][j] = min(fw_array[i][j],
+                                 fw_array[i][k] + fw_array[k][j]
+                                 )
+for i in range(n):
+    for j in range(n):
+        distance = fw_array[i][j]
+        print(f"({i+1},{j+1}) : distance = {distance}, path =", path(i+1, j+1, fw_array_cp))
